@@ -105,7 +105,8 @@
         android:layout_height="40dp"
         android:src="@drawable/baseline_indeterminate_check_box_24"
         app:layout_constraintEnd_toEndOf="@+id/imageView_food_view"
-        tools:layout_editor_absoluteY="529dp" />
+        tools:layout_editor_absoluteY="529dp"
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/textView_product_piece"

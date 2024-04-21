@@ -20,9 +20,4 @@
         android:name="com.samet.orderapp.ui.BoxFragment"
         android:label="fragment_box"
         tools:layout="@layout/fragment_box" />
-    <fragment
-        android:id="@+id/productDetailFragment"
-        android:name="com.samet.orderapp.ui.ProductDetailFragment"
-        android:label="fragment_product_detail"
-        tools:layout="@layout/fragment_product_detail" />
 </navigation>

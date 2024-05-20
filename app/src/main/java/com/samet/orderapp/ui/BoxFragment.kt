@@ -1,60 +1,108 @@
 package com.samet.orderapp.ui
 
+import android.opengl.Visibility
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.samet.orderapp.R
+import com.samet.orderapp.adapter.BoxFragmentAdapter
+import com.samet.orderapp.adapter.MainFragmentAdapter
+import com.samet.orderapp.databinding.FragmentBoxBinding
+import com.samet.orderapp.databinding.FragmentMainBinding
+import com.samet.orderapp.model.SepetYemekler
+import com.samet.orderapp.model.Yemekler
+import com.samet.orderapp.ui.viewmodels.BoxFragmentViewModel
+import com.samet.orderapp.ui.viewmodels.MainFragmentViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [BoxFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class BoxFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private lateinit var binding: FragmentBoxBinding
+    private lateinit var viewModel: BoxFragmentViewModel
+    private lateinit var boxFragmentAdapter: BoxFragmentAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        val tempViewModel: BoxFragmentViewModel by viewModels()
+        viewModel = tempViewModel
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_box, container, false)
+        binding = FragmentBoxBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment BoxFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            BoxFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+
+        viewModel.getBoxFoods()
+        viewModel.boxList.observe(viewLifecycleOwner, Observer {
+
+
+            if (!it?.sepet_yemekler.isNullOrEmpty()) {
+                boxFragmentAdapter.differ.submitList(it?.sepet_yemekler)
+                binding.recyclerViewSepet.isVisible = true
+                binding.textViewToplam.isVisible = true
+                binding.textViewLastAmount.isVisible = true
+                binding.textviewApproveToBoxButton.isVisible = true
+                binding.noItemsBox.isVisible = false
+                var totalAmountText = showTotalAmount(it!!.sepet_yemekler)
+                binding.textViewLastAmount.text = totalAmountText.toString() + " " + "TL"
             }
+        })
+        viewModel.emptyBoxText.observe(viewLifecycleOwner) { emptyText ->
+            binding.noItemsBox.text = emptyText
+            binding.noItemsBox.isVisible = true
+            binding.recyclerViewSepet.isVisible = false
+            binding.textViewToplam.isVisible = false
+            binding.textViewLastAmount.isVisible = false
+            binding.textviewApproveToBoxButton.isVisible = false
+        }
+
+        binding.buttonOk.setOnClickListener {
+            binding.cvEmpty.isVisible = false
+
+        }
+        binding.textviewApproveToBoxButton.setOnClickListener {
+            binding.cvEmpty.isVisible = true
+            binding.textViewLastAmount.isVisible = false
+            viewModel.ok()
+        }
     }
+
+    private fun setupRecyclerView() {
+        boxFragmentAdapter = BoxFragmentAdapter(viewModel)
+        binding.recyclerViewSepet.apply {
+            adapter = boxFragmentAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+    }
+
+    private fun showTotalAmount(list: List<SepetYemekler>): Double {
+        var totalAmount = 0.0
+        for (yemek in list) {
+            totalAmount += yemek.yemek_fiyat.toDouble() * yemek.yemek_siparis_adet.toDouble()
+        }
+        return totalAmount
+    }
+
+
 }
+
+

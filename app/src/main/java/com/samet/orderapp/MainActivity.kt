@@ -8,7 +8,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.samet.orderapp.model.Yemekler
+import com.samet.orderapp.ui.BoxFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,5 +21,8 @@ class MainActivity : AppCompatActivity() {
         val buttomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         val navController = Navigation.findNavController(this,R.id.hostFragment)
         NavigationUI.setupWithNavController(buttomNavigation,navController)
+
+
     }
+
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat.startActivity
@@ -22,10 +23,11 @@ import com.samet.orderapp.ProductDetailActivity
 import com.samet.orderapp.R
 import com.samet.orderapp.model.Yemekler
 import com.samet.orderapp.ui.MainFragment
+import com.samet.orderapp.ui.viewmodels.MainFragmentViewModel
 import com.samet.orderapp.util.Constans.Companion.BASE_URL
 
 
-class MainFragmentAdapter:RecyclerView.Adapter<MainFragmentAdapter.MainFragmentViewHolder>() {
+class MainFragmentAdapter(val viewModel:MainFragmentViewModel):RecyclerView.Adapter<MainFragmentAdapter.MainFragmentViewHolder>() {
     inner class MainFragmentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     lateinit var cardView: CardView
     lateinit var addFavorite: ImageView
@@ -58,7 +60,6 @@ class MainFragmentAdapter:RecyclerView.Adapter<MainFragmentAdapter.MainFragmentV
         val yemek= differ.currentList[position]
 
         cardView= holder.itemView.findViewById(R.id.cardView)
-        addFavorite= holder.itemView.findViewById(R.id.add_favourite)
         foodImage= holder.itemView.findViewById(R.id.food_image)
         foodText= holder.itemView.findViewById(R.id.food_name)
         foodAmount= holder.itemView.findViewById(R.id.amount)
@@ -73,6 +74,11 @@ class MainFragmentAdapter:RecyclerView.Adapter<MainFragmentAdapter.MainFragmentV
                 val intent= Intent(holder.itemView.context,ProductDetailActivity::class.java)
                 intent.putExtra("yemek",yemek)
                 holder.itemView.context.startActivity(intent)
+            }
+            addBox.setOnClickListener {
+                viewModel.addToBox(yemek.yemek_adi,yemek.yemek_resim_adi,yemek.yemek_fiyat.toInt(),1,"Samet")
+                Toast.makeText(holder.itemView.context, "Ürününüz sepete eklenmiştir.", Toast.LENGTH_SHORT).show()
+
             }
         }
     }
